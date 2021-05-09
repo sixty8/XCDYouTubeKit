@@ -1,3 +1,114 @@
+#### Version 2.15.2
+
+* Adaptation to YouTube API change (#510)
+
+#### Version 2.15.1
+
+* Adaptation to YouTube API change (#507, #504)
+
+#### Version 2.15.0
+
+* Adaptation to YouTube API change (#501)
+* New `XCDYouTubeErrorUnknown` error code (#484, #491)
+* New `XCDYouTubeErrorTooManyRequests` error code ([comment](https://github.com/0xced/XCDYouTubeKit/issues/501#issuecomment-716812836))
+* Improve error message for `XCDYouTubeErrorNoStreamAvailable` code
+* Remove platforms in Swift Package Manager (#496)
+
+#### Version 2.14.1
+
+* Adaptation to YouTube API change. (#487)
+
+#### Version 2.14.0
+
+* Add new `XCDYouTubeErrorEmptyResponse` error (#479)
+* Adaptation to YouTube API change. (a048776eb0d87de869c1636e244d78ffb311adc6)
+
+#### Version 2.13.0
+
+* Deprecated `-[XCDYouTubeVideo thumbnailURL]` use `-[XCDYouTubeVideo thumbnailURLs]` (#477)
+* Exclude plist files from Swift Package Manager (#478)
+* Annotate `languageIdentifier` argument as `nullable` in `XCDYouTubeVideoOperation`
+* Add new `author`, `videoDescription` and `channelIdentifier` properties to `XCDYouTubeVideo` (#471)
+
+#### Version 2.12.0
+
+* Add the ability to specify which `streamURLs` to query via `-[XCDYouTubeClient queryVideo:video:streamURLsToQuery:options:cookies:completionHandler:]` & `XCDYouTubeVideoQueryOperation` class.
+	* `initWithVideo:streamURLsToQuery:options:cookies:` is now the designated initializer for  `XCDYouTubeVideoQueryOperation`.
+* Correctly annotate the `streamURLs` & `streamErrors` properties as `nullable`.
+
+#### Version 2.11.0
+
+* `-[XCDYouTubeClient queryVideo:video:cookies:completionHandler:]` completion handler is now correctly called on the main thread.
+* Improved video querying to handle videos that have incomplete streams. (#456)
+* Errors returned in `streamErrors` may contain the `NSLocalizedRecoverySuggestionErrorKey` key in `-[NSError userInfo]` when `NSURLErrorNetworkConnectionLost` is reported, this may indicate the file is incomplete on YouTube's server. 
+* Add logging to `XCDYouTubeVideoQueryOperation` class.
+* Improved `-[XCDYouTubeVideoQueryOperation description]`.
+
+#### Version 2.10.0
+
+* Fixed issue that caused certain videos to return error (#468)
+* Add the ability to query `XCDYouTubeVideo` for reachable streams via `-[XCDYouTubeClient queryVideo:video:cookies:completionHandler:]` & `XCDYouTubeVideoQueryOperation` class
+* Add new `videoIdentifiers` property in `XCDYouTubeVideo` (#290)
+
+#### Version 2.9.0
+
+* Add the ability to use custom regular expression patterns via `-[XCDYouTubeClient getVideoWithIdentifier:cookies:customPatterns:completionHandler:]` & `initWithVideoIdentifier:cookies:languageIdentifier:customPatterns` (#463, #199)
+* Add new `viewCount` property in `XCDYouTubeVideo` (#460)
+* Silence warning about deprecated implementation (#450)
+
+#### Version 2.8.3
+
+* Adaptation to YouTube API change. (#458)
+
+#### Version 2.8.2
+
+* Add new `streamURL` property on `XCDYouTubeVideo`
+* Fixed Swift Package Manager (#441)
+* Support iOS 13 in Demo Projects
+  * Support background playback (#427, #442)
+
+#### Version 2.8.1
+
+* Adaptation to YouTube API change. (#447, #448, #449)
+
+#### Version 2.8.0
+
+* Adaptation to YouTube API change.
+	* Deprecated `XCDYouTubeErrorRestrictedPlayback` & `XCDYouTubeErrorInvalidVideoIdentifier` use `XCDYouTubeErrorNoStreamAvailable` instead.
+
+#### Version 2.7.8
+
+* Adaptation to YouTube API change. (#443)
+
+#### Version 2.7.7
+
+* Add another player script regular expression (#438)
+
+#### Version 2.7.6
+
+* Adaptation to YouTube API change. (#437)
+
+#### Version 2.7.5
+
+* Adaptation to YouTube API change. (#433)
+
+#### Version 2.7.4
+
+* Add the ability to fetch certain age-gate videos. (#431)
+
+#### Version 2.7.3
+
+* Adaptation to YouTube API change. (#419, #422. #421)
+* Fix JavaScript exception: ReferenceError (#418, #420)
+
+#### Version 2.7.2
+
+* Adaptation to YouTube API change. (#417)
+
+#### Version 2.7.1
+
+* Fixed Xcode project parsing error (#409, #411)
+
 #### Version 2.7.0
 
 * Add the ability assign cookies via `-[XCDYouTubeClient getVideoWithIdentifier:cookies:completionHandler:]` & `initWithVideoIdentifier:cookies:languageIdentifier:`
