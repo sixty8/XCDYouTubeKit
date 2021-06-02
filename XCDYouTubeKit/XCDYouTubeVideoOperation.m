@@ -13,7 +13,6 @@
 #import "XCDYouTubePlayerScript.h"
 #import "XCDYouTubeLogger+Private.h"
 
-
 typedef NS_ENUM(NSUInteger, XCDYouTubeRequestType) {
 	XCDYouTubeRequestTypeGetVideoInfo = 1,
 	XCDYouTubeRequestTypeWatchPage,
@@ -150,7 +149,7 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 		NSString *eventLabel = [self.eventLabels objectAtIndex:0];
 		[self.eventLabels removeObjectAtIndex:0];
 		
-        NSDictionary *query = @{ @"video_id": self.videoIdentifier, @"hl": self.languageIdentifier, @"el": eventLabel, @"ps": @"default", @"html5" : @1 };
+		NSDictionary *query = @{ @"video_id": self.videoIdentifier, @"hl": self.languageIdentifier, @"el": eventLabel, @"ps": @"default", @"html5" : @"1" };
 		NSString *queryString = XCDQueryStringWithDictionary(query);
 		NSURL *videoInfoURL = [NSURL URLWithString:[@"https://www.youtube.com/get_video_info?" stringByAppendingString:queryString]];
 		[self startRequestWithURL:videoInfoURL type:XCDYouTubeRequestTypeGetVideoInfo];
@@ -160,7 +159,6 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 - (void) startWatchPageRequest
 {
 	NSDictionary *query = @{ @"v": self.videoIdentifier, @"hl": self.languageIdentifier, @"has_verified": @YES, @"bpctr": @9999999999 };
-    
 	NSString *queryString = XCDQueryStringWithDictionary(query);
 	NSURL *webpageURL = [NSURL URLWithString:[@"https://www.youtube.com/watch?" stringByAppendingString:queryString]];
 	[self startRequestWithURL:webpageURL type:XCDYouTubeRequestTypeWatchPage];
@@ -272,9 +270,48 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 
 #pragma mark - Response Parsing
 
+- (void) initializeConsentWithResponse:(NSURLResponse *)response {
+	NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+	if (httpResponse && response.URL) {
+		NSArray <NSHTTPCookie *> *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:httpResponse.allHeaderFields forURL:(NSURL *_Nonnull)response.URL];
+		
+		for (NSHTTPCookie *cookie in cookies) {
+			if ([cookie.name isEqualToString:@"__Secure-3PSID"]) return;
+		}
+		
+		for (NSHTTPCookie *cookie in cookies) {
+			if ([cookie.name isEqualToString:@"CONSENT"]) {
+				if ([cookie.value isEqualToString:@"YES"]) return;
+				
+				NSString *rawConsentID = [cookie.value stringByReplacingOccurrencesOfString:@"PENDING+" withString:@""];
+				int consentID = [rawConsentID intValue];
+				
+				// generate random consent id, if doesn't match expected format
+				if (consentID < 100 || consentID > 999) {
+					consentID = 100 + (int)arc4random_uniform((uint32_t)(999 - 100 + 1));
+				}
+				
+				NSString *cookieValue = [[NSString alloc] initWithFormat:@"YES+cb.20210328-17-p0.en+FX+%i", consentID];
+				NSHTTPCookie *consentCookie = [NSHTTPCookie cookieWithProperties:@{
+														NSHTTPCookiePath: @"/",
+														NSHTTPCookieName: @"CONSENT",
+														NSHTTPCookieValue: cookieValue,
+														NSHTTPCookieDomain:@".youtube.com",
+														NSHTTPCookieSecure:@"TRUE"
+				}];
+				[self.session.configuration.HTTPCookieStorage setCookie:consentCookie];
+				return;
+			}
+		}
+		
+	}
+}
+
 - (void) handleVideoInfoResponseWithInfo:(NSDictionary *)info response:(NSURLResponse *)response
 {
 	XCDYouTubeLogDebug(@"Handling video info response");
+	
+	[self initializeConsentWithResponse:response];
 	
 	NSError *error = nil;
 	XCDYouTubeVideo *video = [[XCDYouTubeVideo alloc] initWithIdentifier:self.videoIdentifier info:info playerScript:self.playerScript response:response error:&error];
@@ -360,8 +397,8 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 	{
 		NSString *eurl = [@"https://youtube.googleapis.com/v/" stringByAppendingString:self.videoIdentifier];
 		NSString *sts = self.embedWebpage.sts ?: self.webpage.sts ?: @"";
-        NSDictionary *query = @{ @"video_id": self.videoIdentifier, @"hl": self.languageIdentifier, @"eurl": eurl, @"sts": sts, @"html5" : @1 };
-        NSString *queryString = XCDQueryStringWithDictionary(query);
+		NSDictionary *query = @{ @"video_id": self.videoIdentifier, @"hl": self.languageIdentifier, @"eurl": eurl, @"sts": sts};
+		NSString *queryString = XCDQueryStringWithDictionary(query);
 		NSURL *videoInfoURL = [NSURL URLWithString:[@"https://www.youtube.com/get_video_info?" stringByAppendingString:queryString]];
 		[self startRequestWithURL:videoInfoURL type:XCDYouTubeRequestTypeGetVideoInfo];
 	}
