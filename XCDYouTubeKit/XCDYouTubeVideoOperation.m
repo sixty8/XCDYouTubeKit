@@ -395,6 +395,9 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 	
 	if (self.webpage.isAgeRestricted && self.cookies.count == 0)
 	{
+		NSString *eventLabel = [self.eventLabels objectAtIndex:0];
+		[self.eventLabels removeObjectAtIndex:0];
+		
 		NSString *eurl = [@"https://youtube.googleapis.com/v/" stringByAppendingString:self.videoIdentifier];
 		NSString *sts = self.embedWebpage.sts ?: self.webpage.sts ?: @"";
 		//NSDictionary *query = @{ @"video_id": self.videoIdentifier, @"hl": self.languageIdentifier, @"eurl": eurl, @"sts": sts};
